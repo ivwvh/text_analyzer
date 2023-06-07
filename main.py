@@ -7,15 +7,11 @@
 
 """
 
-text = open("./test.txt", '+r', encoding="utf-8").read()
-
 
 class TextAnalyzer:
-    def __init__(self, text: str) -> None:
-        self.text = text
-
-    def print_text(self) -> None:
+    def __init__(self) -> None:
+        self.text = open("./test.txt", '+r', encoding="utf-8").read()
         print(self.text)
 
 
-TextAnalyzer(text).print_text()
+TextAnalyzer()
