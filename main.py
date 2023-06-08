@@ -30,4 +30,4 @@ class TextAnalyzer:
         print(self.text)
 
 
-TextAnalyzer("")
+TextAnalyzer()
