@@ -11,13 +11,11 @@ from sys import exit
 
 class TextAnalyzer:
     def __init__(self, file_path=None, text_encoding="utf-8") -> None:
-        self.text_encoding = input("Введите название кодировки: ")
         if not file_path:
             print("Не указан путь к файлу")
             exit()
         self.file_path = Path(file_path)
-        if not self.text_encoding:
-            self.text_encoding = text_encoding
+        self.text_encoding = text_encoding
 
         self.open_file()
         self.get_text()
