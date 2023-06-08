@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from sys import exit
 """
 
 Скачать текст
@@ -12,22 +12,27 @@ from pathlib import Path
 class TextAnalyzer:
     def __init__(self, file_path=None, text_encoding="utf-8") -> None:
         self.text_encoding = input("Введите название кодировки: ")
+        if not file_path:
+            print("Не указан путь к файлу")
+            exit()
         self.file_path = Path(file_path)
         if not self.text_encoding:
             self.text_encoding = text_encoding
-        if not file_path:
-            self.file_path = Path(input("Введите путь до файла: "))
 
+        self.open_file()
         self.get_text()
         self.print_text()
 
-    def get_text(self) -> None:
+    def open_file(self) -> None:
         self.text = open(self.file_path,
                          '+r',
-                         encoding=self.text_encoding).read()
+                         encoding=self.text_encoding)
+
+    def get_text(self):
+        self.text = self.text.read()
 
     def print_text(self) -> None:
         print(self.text)
 
 
-TextAnalyzer()
+TextAnalyzer(file_path="./test.txt")
