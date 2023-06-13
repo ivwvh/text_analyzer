@@ -52,12 +52,11 @@ class TextAnalyzer:
     def clean_text(self) -> None:
         for i in range(len(self.words)):
             for symbol in self.words[i]:
-                if symbol in punctuation:
+                if symbol in punctuation + "—":
                     punct = symbol
                     self.words[i] = self.words[i].replace(punct, "")
-        for i in range(self.words.count("")):
-            self.words.remove("")
-        print(self.words)
+        self.clean_words = [i for i in self.words if i]
+        print(self.clean_words)
 
 
 TextAnalyzer(file_path="./test.txt")
