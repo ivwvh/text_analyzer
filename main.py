@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import NoReturn
 from string import punctuation
+import re
 
 """
 
@@ -21,8 +22,8 @@ class TextAnalyzer:
         self.open_file()
         self.get_text()
         self.make_lower()
-        self.get_words()
         self.clean_text()
+        self.get_words()
 
     def open_file(self) -> None | NoReturn:
         try:
@@ -46,17 +47,12 @@ class TextAnalyzer:
     def print_text(self) -> None:
         print(self.text)
 
-    def get_words(self) -> None:
-        self.words = self.text.split()
-
     def clean_text(self) -> None:
-        for i in range(len(self.words)):
-            for symbol in self.words[i]:
-                if symbol in punctuation + "—":
-                    punct = symbol
-                    self.words[i] = self.words[i].replace(punct, "")
-        self.clean_words = [i for i in self.words if i]
-        print(self.clean_words)
+        self.text = re.sub("[.,!?—]", "", self.text)
+
+    def get_words(self) -> None:
+        self.words = [i for i in self.text.split() if i]
+        print(self.words)
 
 
 TextAnalyzer(file_path="./test.txt")
