@@ -1,7 +1,6 @@
+import re
 from pathlib import Path
 from typing import NoReturn
-from string import punctuation
-import re
 
 """
 
@@ -28,14 +27,16 @@ class TextAnalyzer:
     def open_file(self) -> None | NoReturn:
         try:
             file = open(self.file_path,
-                      '+r',
-                      encoding=self.text_encoding)
+                        '+r',
+                        encoding=self.text_encoding
+                        )
             self.file = file
         except FileNotFoundError:
-            raise Exception("Файл не найден")
+            raise FileNotFoundError("Файл не найден")
 
     def get_text(self) -> None:
         self.text = self.file.read()
+        self.file.close()
 
     def check_empty_file(self) -> RuntimeError | None:
         if not self.text:
@@ -48,11 +49,10 @@ class TextAnalyzer:
         print(self.text)
 
     def clean_text(self) -> None:
-        self.text = re.sub("[.,!?—]", "", self.text)
+        self.text = [word for word in re.split("[\W]", self.text) if word]
 
     def get_words(self) -> None:
-        self.words = [i for i in self.text.split() if i]
-        print(self.words)
+        self.words = self.text
 
 
 TextAnalyzer(file_path="./test.txt")
