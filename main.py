@@ -1,7 +1,7 @@
-import re
+import re 
 from pathlib import Path
 from typing import NoReturn
-
+import pymorphy3
 """
 
 Скачать текст
@@ -22,7 +22,7 @@ class TextAnalyzer:
         self.get_text()
         self.make_lower()
         self.clean_text()
-        self.get_words()
+        print(self.get_pos())
 
     def open_file(self) -> None | NoReturn:
         try:
@@ -45,14 +45,25 @@ class TextAnalyzer:
     def make_lower(self) -> None:
         self.text = self.text.lower()
 
+    def clean_text(self) -> None:
+        self.text = re.findall(r"[А-Яа-яёЁ]+", self.text)
+
+    def get_pos(self) -> list:
+        mngr = pymorphy3.MorphAnalyzer()
+        all_words = {i: mngr.parse(i)[0].tag.POS for i in self.text}
+        pos = int(input("""
+        Введите 1 чтобы вывести все глаголы
+        Введите 2 чтобы показать все существительные
+        Введите 3 чтобы показать все прилагательные: """))
+        if pos == 1:
+            return [i for i in all_words if all_words.get(i) == "VERB"]
+        elif pos == 2:
+            return [i for i in all_words if all_words.get(i) == "NOUN"]
+        elif pos == 3:
+            return [i for i in all_words if all_words.get(i) == "ADJF" or all_words.get(i) == "ADJS"]
+
+    
     def print_text(self) -> None:
         print(self.text)
-
-    def clean_text(self) -> None:
-        self.text = [word for word in re.split("[\W]", self.text) if word]
-
-    def get_words(self) -> None:
-        self.words = self.text
-
 
 TextAnalyzer(file_path="./test.txt")
