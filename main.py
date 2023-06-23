@@ -50,7 +50,7 @@ class TextAnalyzer:
 
     def get_pos(self) -> list:
         mngr = pymorphy3.MorphAnalyzer()
-        all_words = {i: mngr.parse(i)[0].tag.POS for i in self.text}
+        all_words = {mngr.parse(i)[0].normal_form: mngr.parse(i)[0].tag.POS for i in self.text}
         pos = int(input("""
         Введите 1 чтобы вывести все глаголы
         Введите 2 чтобы показать все существительные
