@@ -22,7 +22,7 @@ class TextAnalyzer:
         self.get_text()
         self.make_lower()
         self.clean_text()
-        print(self.get_pos())
+        self.get_pos(["NOUN", "VERB"])
 
     def open_file(self) -> None | NoReturn:
         try:
@@ -43,27 +43,27 @@ class TextAnalyzer:
             raise RuntimeError("Файл пуст")
 
     def make_lower(self) -> None:
+        self.check_empty_file()
         self.text = self.text.lower()
 
     def clean_text(self) -> None:
+        self.check_empty_file()
         self.text = re.findall(r"[А-Яа-яёЁ]+", self.text)
 
-    def get_pos(self) -> list:
+    def get_pos(self, pos: list = None) -> None:
+        self.check_empty_file()
+        if not pos:
+            raise Exception("Не указана часть речи")
         mngr = pymorphy3.MorphAnalyzer()
         all_words = {mngr.parse(i)[0].normal_form: mngr.parse(i)[0].tag.POS for i in self.text}
-        pos = int(input("""
-        Введите 1 чтобы вывести все глаголы
-        Введите 2 чтобы показать все существительные
-        Введите 3 чтобы показать все прилагательные: """))
-        if pos == 1:
-            return [i for i in all_words if all_words.get(i) == "VERB"]
-        elif pos == 2:
-            return [i for i in all_words if all_words.get(i) == "NOUN"]
-        elif pos == 3:
-            return [i for i in all_words if all_words.get(i) == "ADJF" or all_words.get(i) == "ADJS"]
+        if len(pos) == 1:
+            print(f"{pos[0]}: {[i for i in all_words if all_words.get(i) == pos[0]]}")
+        else:
+            for part in pos:
+                print(f"{part}: {[i for i in all_words if all_words.get(i) == part]}")
 
-    
     def print_text(self) -> None:
         print(self.text)
+
 
 TextAnalyzer(file_path="./test.txt")
