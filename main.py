@@ -1,7 +1,10 @@
-import re 
+import re
 from pathlib import Path
 from typing import NoReturn
+
+import chardet
 import pymorphy3
+
 """
 
 Скачать текст
@@ -12,11 +15,15 @@ import pymorphy3
 
 
 class TextAnalyzer:
-    def __init__(self, file_path=None, text_encoding="utf-8") -> None:
+    def __init__(self, file_path=None, text_encoding=None) -> None:
         if not file_path:
             raise Exception("Не указан путь к файлу")
         self.file_path = Path(file_path)
-        self.text_encoding = text_encoding
+        if not text_encoding:
+            rawdata = open(self.file_path, "rb").read()  # получаем сырые данные
+            self.text_encoding = chardet.detect(rawdata).get("encoding")  # с помощью бибилиотеки chardet пытаемся определить кодировку
+        else:
+            self.text_encoding = text_encoding
 
         self.open_file()
         self.get_text()
