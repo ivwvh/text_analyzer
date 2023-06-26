@@ -15,7 +15,7 @@ import pymorphy3
 
 
 class TextAnalyzer:
-    def __init__(self, file_path=None, text_encoding=None) -> None:
+    def __init__(self, file_path=None, text_encoding=None, pos=None) -> None:
         if not file_path:
             raise Exception("Не указан путь к файлу")
         self.file_path = Path(file_path)
@@ -29,7 +29,7 @@ class TextAnalyzer:
         self.get_text()
         self.make_lower()
         self.clean_text()
-        self.get_pos(["NOUN", "VERB"])
+        self.get_pos(pos)
 
     def open_file(self) -> None | NoReturn:
         try:
