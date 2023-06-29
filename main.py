@@ -7,6 +7,7 @@ import pymorphy3
 from collections import Counter
 
 import wordcloud
+import random
 """
 
 Скачать текст
@@ -20,18 +21,20 @@ class TextAnalyzer:
     def __init__(self,
                  file_path=None,
                  text_encoding=None,
-                 pos: list = None,
-                 cloud_pos=[],
+                 pos=None,
                  cloud_width=400,
                  cloud_height=400,
                  cloud_max_words=200,
-                 cloud_path="./cloud.jpg") -> None:
+                 cloud_file_name="cloud",
+                 cloud_color=(),
+                 most_common_max_words=10
+                 ) -> None:
         if not file_path:
             raise Exception("Не указан путь к файлу")
         self.file_path = Path(file_path)
         if not text_encoding:
-            rawdata = open(self.file_path, "rb").read()  # получаем сырые данные
-            self.text_encoding = chardet.detect(rawdata).get("encoding")  # с помощью бибилиотеки chardet пытаемся определить кодировку
+            rawdata = open(self.file_path, "rb").read()
+            self.text_encoding = chardet.detect(rawdata).get("encoding")
         else:
             self.text_encoding = text_encoding
         self.open_file()
@@ -39,12 +42,14 @@ class TextAnalyzer:
         self.make_lower()
         self.clean_text()
         self.get_pos(pos)
-        self.get_most_common(["VERB"])
-        self.generate_cloud(cloud_pos,
+        self.get_most_common(["VERB"],
+                             max_words=most_common_max_words)
+        self.generate_cloud(pos,
                             cloud_width,
                             cloud_height,
                             max_words=cloud_max_words,
-                            path=cloud_path)
+                            cloud_file_name=cloud_file_name,
+                            color=cloud_color)
 
     def open_file(self) -> None | NoReturn:
         try:
@@ -73,6 +78,7 @@ class TextAnalyzer:
         self.text = re.findall(r"[А-Яа-яёЁ]+", self.text)
 
     def get_pos(self, pos: list = None) -> None:
+        """TODO: РАЗОБРАТЬСЯ С ГЕНЕРАТОРАМИ"""
         self.check_empty_file()
         if not pos:
             raise Exception("Не указана часть речи")
@@ -89,41 +95,51 @@ class TextAnalyzer:
                 print(f"{part}: {[i for i in self.all_words if self.all_words[i] == part]}")
 
     def generate_cloud(self,
-                       pos: list = None,
-                       width: int = 400,
-                       height: int = 400,
-                       path: str | Path = None,
-                       max_words: int = 200) -> None:
-        if not pos:
-            raise Exception("Не указана часть речи")
+                       pos=None,
+                       width=400,
+                       height=400,
+                       cloud_file_name="cloud",
+                       max_words=200,
+                       color=()
+                       ) -> None:
+        '''TODO: СЛИШКОМ МНОГО ОТВЕТСТВЕННОСТИ'''
+        if len(pos) == 1:
+            words = [i for i in self.all_words if self.all_words[i] == pos[0]]
+            text = " ".join(words)
         else:
-            if len(pos) == 1:
-                words = [i for i in self.all_words if self.all_words[i] == pos[0]]
-                text = " ".join(words)
-            else:
-                words = []
-                for part in pos:
-                    words.extend([i for i in self.all_words if self.all_words[i] == part])
-                text = " ".join(words)
-        if not path:
-            raise Exception("Не указан путь к картинке")
+            words = []
+            for part in pos:
+                words.extend([i for i in self.all_words if self.all_words[i] == part])
+            text = " ".join(words)
+        if not cloud_file_name:
+            raise Exception("Не указано название картинки")
+        if not color:
+            color = tuple(random.randint(0, 255) for i in range(3))
         cloud = wordcloud.WordCloud(width=width,
                                     height=height,
-                                    max_words=max_words).generate(text)
-        cloud.to_file(path)
+                                    max_words=max_words,
+                                    color_func=lambda *args, **kwargs: color).generate(text)
+        cloud.to_file(f"./{cloud_file_name}.jpg")
 
-    def get_most_common(self, pos):
+    def get_most_common(self,
+                        pos,
+                        max_words=10):
         words = [word for word in self.text if self.mngr.parse(word)[0].tag.POS == pos[0]]
         counter = Counter(words)
         print("\n")
-        counted = counter.most_common(10)
+        counted = counter.most_common(max_words)
         for tup in counted:
             print(f"Слово: {tup[0]}, количество использований: {tup[1]}")
 
-    def print_text(self) -> None:
-        print(self.text)
+    def print_result(self, pos) -> None:
+        "TODO: КОЛИЧЕСТВО НУЖНЫХ СЛОВ, КУДА СОХРАНЯЕТСЯ КАРТИНКА"
+        print(f'Всего слов в тексте: {len(self.text)}')
+        print(f'Из них {pos}: {len(self.text)}')
+        print(f'Картинка сохранена в: {len(self.text)}')
 
 
-TextAnalyzer(file_path="./test.txt", pos=["NOUN", "VERB"],
-             cloud_pos=['VERB'],
-             cloud_max_words=1000)
+TextAnalyzer(file_path="./test.txt",
+             pos=["NOUN", "VERB"],
+             cloud_max_words=1000,
+             most_common_max_words=12
+             )
