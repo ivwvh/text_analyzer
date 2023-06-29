@@ -43,7 +43,8 @@ class TextAnalyzer:
         self.generate_cloud(cloud_pos,
                             cloud_width,
                             cloud_height,
-                            max_words=cloud_max_words)
+                            max_words=cloud_max_words,
+                            path=cloud_path)
 
     def open_file(self) -> None | NoReturn:
         try:
@@ -105,7 +106,7 @@ class TextAnalyzer:
                     words.extend([i for i in self.all_words if self.all_words[i] == part])
                 text = " ".join(words)
         if not path:
-            path = Path("./wordclouds/cloud.jpg")
+            raise Exception("Не указан путь к картинке")
         cloud = wordcloud.WordCloud(width=width,
                                     height=height,
                                     max_words=max_words).generate(text)
